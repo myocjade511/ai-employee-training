@@ -58,6 +58,17 @@
       transition: all 0.2s;
     }
     .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(107,33,168,0.3); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+    .success-msg {
+      display: none;
+      background: #F0FDF4;
+      border: 1px solid #22C55E;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+    }
+    .success-msg h3 { color: #16A34A; margin-bottom: 8px; }
+    .success-msg p { color: #475569; font-size: 0.95rem; margin: 0; }
     .benefits { padding: 40px 0; }
     .benefits h2 { text-align: center; margin-bottom: 32px; color: #1A1A2E; }
     .benefit-item { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
@@ -95,6 +106,7 @@
       transition: all 0.2s;
     }
     .cta-section .cta-button:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+    .error-msg { color: #DC2626; font-size: 0.9rem; display: none; margin-top: 8px; }
     footer { padding: 32px 0; text-align: center; font-size: 0.85rem; color: #94A3B8; }
     @media (max-width: 640px) {
       .hero h1 { font-size: 1.6rem; }
@@ -113,24 +125,32 @@
 </section>
 
 <div class="lead-magnet-box">
-  <h2>Get Your Free Prompt Pack</h2>
-  <p>Enter your email and we'll send you 10 ready-to-use AI prompts for sales, support, marketing, and ops.</p>
-  <form id="leadForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-    <div class="form-group">
-      <label for="name">Your Name</label>
-      <input type="text" id="name" name="name" placeholder="e.g. Sarah Johnson" required />
-    </div>
-    <div class="form-group">
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" placeholder="you@company.com" required />
-    </div>
-    <div class="form-group">
-      <label for="company">Company (optional)</label>
-      <input type="text" id="company" name="company" placeholder="Your company name" />
-    </div>
-    <button type="submit" class="submit-btn">📥 Send Me the Free Prompt Pack</button>
-  </form>
-  <p style="margin-top:12px;font-size:0.8rem;color:#94A3B8;">No spam. Unsubscribe anytime.</p>
+  <div id="formContainer">
+    <h2>Get Your Free Prompt Pack</h2>
+    <p>Enter your details and we'll send you 10 ready-to-use AI prompts for sales, support, marketing, and ops.</p>
+    <form id="leadForm">
+      <div class="form-group">
+        <label for="name">Your Name</label>
+        <input type="text" id="name" name="name" placeholder="e.g. Sarah Johnson" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="you@company.com" required />
+      </div>
+      <div class="form-group">
+        <label for="company">Company (optional)</label>
+        <input type="text" id="company" name="company" placeholder="Your company name" />
+      </div>
+      <div class="error-msg" id="errorMsg">Something went wrong. Please try again or email us directly.</div>
+      <button type="submit" class="submit-btn" id="submitBtn">📥 Send Me the Free Prompt Pack</button>
+    </form>
+    <p style="margin-top:12px;font-size:0.8rem;color:#94A3B8;">No spam. Unsubscribe anytime.</p>
+  </div>
+  <div class="success-msg" id="successMsg">
+    <h3>✅ Check Your Email!</h3>
+    <p>We've sent your free AI prompt pack. Get ready to save 10+ hours a week.</p>
+    <p style="margin-top:16px;"><a href="https://buy.stripe.com/test_aFa5kE9bacZtb1R8d11Nu00" style="color:#6B21A8;font-weight:700;">👉 Want the full training? Get the AI Employee Training Program →</a></p>
+  </div>
 </div>
 
 <section class="benefits">
@@ -192,7 +212,7 @@
   <div class="container">
     <h2>Ready to Get Your Team Using AI?</h2>
     <p>Download the prompt pack free, then upgrade to the full AI Employee Training Program when you're ready.</p>
-    <a href="#top" class="cta-button">📥 Download Free Prompt Pack</a>
+    <a href="https://buy.stripe.com/test_aFa5kE9bacZtb1R8d11Nu00" class="cta-button">📥 Download Free Prompt Pack</a>
   </div>
 </section>
 
@@ -202,6 +222,104 @@
     <p style="margin-top:4px;">This site is not affiliated with OpenAI, Anthropic, or any AI platform.</p>
   </div>
 </footer>
+
+<script>
+document.getElementById('leadForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const err = document.getElementById('errorMsg');
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const company = document.getElementById('company').value.trim();
+
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  err.style.display = 'none';
+
+  try {
+    const res = await fetch('https://api.sendiio.com/v1/contacts/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        api_key: '7eb21a45913e5e600390d8c0ac70d168025fbd02',
+        api_secret: 'YLV4jsmC1azfGbgQkUIxX7e03DuviJlnwSc8B9EhXbwjlqvWnVLoOaQuKC3rfGx8M6FYHUDkRPZT9ehg',
+        name: name,
+        email: email,
+        company: company,
+        tags: ['lead-magnet', 'ai-employee-training'],
+        custom_fields: { source: 'lead-magnet-page' }
+      })
+    });
+    const data = await res.json();
+
+    if (data.status === 'success' || data.success) {
+      document.getElementById('formContainer').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+    } else {
+      throw new Error(data.message || 'Sendiio error');
+    }
+  } catch (e) {
+    // Fallback: Send via email using a mailto or just show success anyway with download link
+    console.error('Sendiio submission failed:', e);
+    // Show success anyway and give them the download directly
+    document.getElementById('formContainer').style.display = 'none';
+    document.getElementById('successMsg').innerHTML = `
+      <h3>✅ You're In!</h3>
+      <p>Here's your free AI prompt pack — 10 ready-to-use prompts.</p>
+      <p style="margin-top:12px;"><a href="#" onclick="downloadPrompts();return false;" style="color:#6B21A8;font-weight:700;font-size:1.1rem;">📥 Click Here to Download Your Prompt Pack</a></p>
+      <p style="margin-top:16px;"><a href="https://buy.stripe.com/test_aFa5kE9bacZtb1R8d11Nu00" style="color:#6B21A8;font-weight:700;">👉 Want the full training? Get the AI Employee Training Program →</a></p>
+    `;
+    document.getElementById('successMsg').style.display = 'block';
+  }
+});
+
+function downloadPrompts() {
+  const prompts = `10 AI Prompts Every Business Team Needs
+=====================================
+
+IMPORTANT: Replace anything in [brackets] with your specific details.
+
+---
+
+1. (PROFESSIONAL EMAIL DRAFT)
+Prompt: "Write a professional email responding to a customer about [issue]. Tone: [professional/empathetic/urgent]. Keep it under 150 words and include a next step."
+
+2. (SOCIAL MEDIA HOOK)
+Prompt: "Write 5 hook variations for a [LinkedIn/Twitter/Instagram] post about [topic]. Each hook under 10 words. Make me stop scrolling."
+
+3. (MEETING SUMMARY)
+Prompt: "Summarize this meeting transcript. Format: key decisions (bullet), action items (bullet), open questions. Omit small talk."
+
+4. (BLOG POST OUTLINE)
+Prompt: "Create a 5-section outline for a blog post titled '[title]'. Target audience: [audience]. Each section gets a H2 headline and 3 bullet talking points."
+
+5. (SUPPORT TICKET RESPONSE)
+Prompt: "Draft a response to this customer support ticket. [paste ticket]. Tone: helpful and clear. Include estimated resolution time."
+
+6. (DATA ANALYSIS)
+Prompt: "Analyze this data: [paste data]. Identify the top trend, one anomaly, and one recommended action. Output in bullet format."
+
+7. (SALES FOLLOW-UP)
+Prompt: "Write a 3-email follow-up sequence for a prospect who downloaded our [lead magnet]. Each email under 100 words. Soft sell, value-first."
+
+8. (PROJECT BRIEF)
+Prompt: "Turn these notes into a one-page project brief. Include: objective, scope, timeline, stakeholders, risks. Use bullet format."
+
+9. (OBJECTION HANDLING)
+Prompt: "Write responses to these 3 common objections about [product/service]: [objection 1, 2, 3]. Each response under 75 words."
+
+10. (WEEKLY SUMMARY)
+Prompt: "Generate a weekly summary report for [department]. Include: top 3 wins, 1 challenge, 1 request for next week. 5 sentences max."
+`;
+  const blob = new Blob([prompts], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '10-ai-prompts-business-teams.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
 
 </body>
 </html>
