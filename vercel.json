@@ -1,9 +1,13 @@
 {
   "version": 2,
   "builds": [
-    { "src": "index.html", "use": "@vercel/static" }
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "lead-magnet.html", "use": "@vercel/static" },
+    { "src": "api/lead.js", "use": "@vercel/node" }
   ],
   "routes": [
+    { "src": "/api/lead", "dest": "/api/lead.js" },
+    { "src": "/lead-magnet", "dest": "/lead-magnet.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

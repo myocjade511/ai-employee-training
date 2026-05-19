@@ -237,31 +237,19 @@ document.getElementById('leadForm').addEventListener('submit', async function(e)
   err.style.display = 'none';
 
   try {
-    const res = await fetch('https://api.sendiio.com/v1/contacts/add', {
+    // POST to our Vercel serverless function (which proxies to Sendiio)
+    const res = await fetch('/api/lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        api_key: '7eb21a45913e5e600390d8c0ac70d168025fbd02',
-        api_secret: 'YLV4jsmC1azfGbgQkUIxX7e03DuviJlnwSc8B9EhXbwjlqvWnVLoOaQuKC3rfGx8M6FYHUDkRPZT9ehg',
-        name: name,
-        email: email,
-        company: company,
-        tags: ['lead-magnet', 'ai-employee-training'],
-        custom_fields: { source: 'lead-magnet-page' }
-      })
+      body: JSON.stringify({ name, email, company })
     });
     const data = await res.json();
 
-    if (data.status === 'success' || data.success) {
-      document.getElementById('formContainer').style.display = 'none';
-      document.getElementById('successMsg').style.display = 'block';
-    } else {
-      throw new Error(data.message || 'Sendiio error');
-    }
+    document.getElementById('formContainer').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
   } catch (e) {
-    // Fallback: Send via email using a mailto or just show success anyway with download link
-    console.error('Sendiio submission failed:', e);
-    // Show success anyway and give them the download directly
+    console.error('Submission failed:', e);
+    // Fallback — give them the download directly
     document.getElementById('formContainer').style.display = 'none';
     document.getElementById('successMsg').innerHTML = `
       <h3>✅ You're In!</h3>
