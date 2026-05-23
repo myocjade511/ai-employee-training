@@ -236,29 +236,24 @@ document.getElementById('leadForm').addEventListener('submit', async function(e)
   btn.textContent = 'Sending...';
   err.style.display = 'none';
 
+  // POST to our Vercel API function (captures to CSV + tries Sendiio)
+  const base = window.location.origin;
+  const apiUrl = base + '/api/lead';
+
   try {
-    // POST to our Vercel serverless function (which proxies to Sendiio)
-    const res = await fetch('/api/lead', {
+    const res = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, company })
     });
     const data = await res.json();
-
-    document.getElementById('formContainer').style.display = 'none';
-    document.getElementById('successMsg').style.display = 'block';
   } catch (e) {
-    console.error('Submission failed:', e);
-    // Fallback — give them the download directly
-    document.getElementById('formContainer').style.display = 'none';
-    document.getElementById('successMsg').innerHTML = `
-      <h3>✅ You're In!</h3>
-      <p>Here's your free AI prompt pack — 10 ready-to-use prompts.</p>
-      <p style="margin-top:12px;"><a href="#" onclick="downloadPrompts();return false;" style="color:#6B21A8;font-weight:700;font-size:1.1rem;">📥 Click Here to Download Your Prompt Pack</a></p>
-      <p style="margin-top:16px;"><a href="https://buy.stripe.com/test_aFa5kE9bacZtb1R8d11Nu00" style="color:#6B21A8;font-weight:700;">👉 Want the full training? Get the AI Employee Training Program →</a></p>
-    `;
-    document.getElementById('successMsg').style.display = 'block';
+    console.error('Lead submission failed:', e);
   }
+
+  // Always show success & give them the download
+  document.getElementById('formContainer').style.display = 'none';
+  document.getElementById('successMsg').style.display = 'block';
 });
 
 function downloadPrompts() {
