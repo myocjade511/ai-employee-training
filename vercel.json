@@ -6,8 +6,9 @@
     { "src": "api/lead.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/api/lead", "dest": "/api/lead.js" },
-    { "src": "/lead-magnet", "dest": "/lead-magnet.html" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "^/api/lead$", "dest": "/api/lead.js" },
+    { "src": "^/lead-magnet/?$", "dest": "/lead-magnet.html" },
+    { "src": "^/lead-magnet.html$", "dest": "/lead-magnet.html" },
+    { "src": "^/(.*)$", "dest": "/index.html" }
   ]
 }
