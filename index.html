@@ -291,6 +291,38 @@
   </div>
 </section>
 
+<section class="section section-light" id="lead-magnet">
+  <div class="container center">
+    <h2>Get "10 AI Prompts Every Business Team Needs" Free</h2>
+    <p>Enter your email to receive 10 proven prompts your team can copy-paste today — plus updates when we release new modules.</p>
+    <form id="leadForm" style="max-width:380px;margin:24px auto;text-align:left;">
+      <input type="text" id="leadName" placeholder="Your first name" required style="width:100%;padding:12px;margin-bottom:10px;border:1px solid #E2E8F0;border-radius:8px;font-size:1rem;font-family:inherit;">
+      <input type="email" id="leadEmail" placeholder="Your email" required style="width:100%;padding:12px;margin-bottom:10px;border:1px solid #E2E8F0;border-radius:8px;font-size:1rem;font-family:inherit;">
+      <button type="submit" style="width:100%;padding:14px;background:#6B21A8;color:#fff;border:none;border-radius:8px;font-size:1.1rem;font-weight:600;cursor:pointer;">Send Me the Free Prompts</button>
+    </form>
+    <p style="font-size:0.85rem;color:#94A3B8;">No spam. Unsubscribe anytime.</p>
+    <div id="leadResult" style="margin-top:12px;text-align:center;"></div>
+  </div>
+  <script>
+    document.getElementById("leadForm")?.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const btn = this.querySelector("button");
+      btn.disabled = true; btn.textContent = "Sending...";
+      try {
+        const res = await fetch("/api/lead", {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({name: document.getElementById("leadName").value.trim(), email: document.getElementById("leadEmail").value.trim()})
+        });
+        const data = await res.json();
+        document.getElementById("leadResult").innerHTML = data.ok ? '<p style="color:#22C55E;">Thanks! Check your email for the prompts.</p>' : '<p style="color:#EF4444;">Something went wrong. Try again.</p>';
+        if (data.ok) this.reset();
+      } catch(e) { document.getElementById("leadResult").innerHTML = '<p style="color:#EF4444;">Network error. Please try again.</p>'; }
+      btn.disabled = false; btn.textContent = "Send Me the Free Prompts";
+    });
+  </script>
+</section>
+
 <section id="cta-final" class="section-dark section center">
   <div class="container">
     <h2>Your Team Is Ready for AI. Are You Ready to Train Them?</h2>
